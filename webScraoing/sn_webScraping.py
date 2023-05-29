@@ -33,19 +33,15 @@ for i in datas:
 # print(final_output)
 
 import csv
-with open('worldo.csv', 'w') as csv_writer:
+with open('worldo.csv', 'w',newline ='') as csv_writer:
     x = csv.writer(csv_writer)
     for i in final_output:
         x.writerow(i)
 
 
-import pandas as pd
-df = pd.read_csv('worldo.csv')
+# import pandas as pd
+# df = pd.read_csv('worldo.csv')
 
-print(df.iloc[8:])
+# print(df.iloc[8:])
 
 
-
-# import plotly.express as px
-# fig = px.bar(df, x='Country,Other', y = 'TotalRecovered')
-# fig.show()
