@@ -1,106 +1,186 @@
-import csv
-import pandas as pd
 
-class CrudCsv():
-    def create_csv(self,name, data, header):
-        file_name = f'{name}.csv'
+class CrudCsv:
+    def create_csv(self):
 
-        with open(file_name, 'w', newline='') as f:
-            writer = csv.writer(f)
+        keys=''
+        for i in self.__dict__.keys():
+            keys+=i+"," 
+        keys = keys[:-1]               
+            # list_value = keys.split(',')
+            # list_value.pop()
+            # print(type(list_value))
+        try:     
+            with open(f"{self.__class__.__name__.lower()}.csv","r") as file:
+                data=file.readlines()
+                
+        except FileNotFoundError:
+            with open(f"{self.__class__.__name__.lower()}.csv","w", newline='') as file:
+                # file.writelines(keys)
+                data = []
+        id=str(self.id)
+        my_data=[i for i in data if i!="\n"]
+        for i in my_data:
+            if id in i:      
+                print("Data with this id already exists")
+                return
 
-        with open(file_name, 'r') as file:
-            reader = csv.reader(file)
-            first_row = next(reader, None)  # Get the first row or None if empty file
+        values=list(self.__dict__.values()) 
 
-        if first_row == header:
-            print("Header exists")
-            split_data = data.split(',')
-            print(split_data)
+        # reading first row heading  
+        with open(f"{self.__class__.__name__.lower()}.csv", 'r', newline='') as file:
+            # reader = csv.reader(file)
+            # first_row = next(reader, None) 
+            # first_row = file.readline().rstrip('\n')
+            first_row = file.readline()
+            print(first_row)# Get the first row or None if empty fil
 
-            with open(file_name, 'a', newline='') as csv_file:
-                writer = csv.writer(csv_file)
-                writer.writerow(split_data)
+        if first_row:
+            print(first_row)
+            print(type(first_row))
 
-        if first_row != header:
-            with open(file_name, 'w') as file:
-                writer = csv.writer(file)
-                writer.writerow(header)
-    
-
-            print(type(data))
-            split_data = data.split(',')
-            print(split_data)
-            with open(file_name, 'a', newline='') as csv_file:
-                    writer = csv.writer(csv_file)
-                    writer.writerow(split_data)
-
-        
-    def update_csv(self, name, data,id):
-        file_name = f'{name}.csv'
-        # reading the csv file
-        df = pd.read_csv(file_name)
-        # updating the column value/data
-        df.loc[id, 'Name'] = data
-        
-        # writing into the file
-        df.to_csv(file_name, index=False)
-  
-
-    def delete_data(self,name, id):
-
-        file_name = f'{name}.csv'
-        rows = []
-        with open(file_name, 'r') as file:
-            reader = csv.reader(file)
-            rows = list(reader)
-        if id < len(rows):
-            del rows[id]
         else:
-            print("Row Not found")
+            with open(f"{self.__class__.__name__.lower()}.csv","w", newline='') as file:
+            #     # writer = csv.writer(file)   
+            #     print(keys)
+                # writer.writerow(list_value)
+                file.writelines(keys)
 
-        # Write the modified contents back to the file
-        with open(file_name, 'w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerows(rows)
+        if first_row == keys:
+            print("Header exists")
+
+            with open(f"{self.__class__.__name__.lower()}.csv", 'a', newline='') as csv_file:
+                # writer = csv.writer(csv_file)
+                # writer.writerow(values)
+                print(type(values))
+                v_str = ''
+                for v in values:
+                    v_str = v_str + str(v) +','
+
+                print(v_str)
+                v_str = '\n' + v_str 
+                csv_file.write(v_str)
+
+                print("Data Added")
+                # csv_file.write('\n')
+        
+    def update_csv(self,*args):
+        with open(f"{self.__class__.__name__.lower()}.csv","r") as file:
+            list_data=file.readlines()
+            print(list_data)
+        # print(args)
+        id = str(args[0])
+        print(id)
+        sys_id = str(self.id)
+        if sys_id == id:
+            print("This is true")
+            for d in range(len(list_data)):
+                if id in list_data[d]:
+                    print(list_data[d])
+                    target = d
+                    print(target)
+                    print("There is")
+                    break
+            print(args)
+            d_str = ''
+            for i in args:
+                d_str = d_str+str(i)+','
+                # d_str = d_str[:-2]
+
+            if target:
+                list_data[target]= d_str[:-1]
+            else:
+                print("Enter correct id")
+
+            with open(f"{self.__class__.__name__.lower()}.csv", "w+",) as update_file:
+                update_file.writelines(list_data)
+
+        else:
+            print("id not found")
+
+    def delete_data(self):
+        with open (f"{self.__class__.__name__.lower()}.csv", 'r') as file_list:
+            list_data = file_list.readlines()
+
+        with open(f"{self.__class__.__name__.lower()}.csv", 'r') as csv_file:
+            # reader = csv.reader(csv_file)
+            reader = csv_file.readlines()
+            data_list = list(reader)
+            # print(len(data_list))
+            for i in range(len(data_list)):
+                if i == 0:
+                    continue
+                print(data_list[i])
+
+        user_id = input("Enter id to delete :- ")
+        print("You entered id " + user_id)
+        target = None
+        sys_id = str(self.id)
+        print("This is true")
+        for d in range(len(list_data)):
+            if user_id in list_data[d]:
+                    print(list_data[d])
+                    target = d
+                    print(target)
+            if target is not None:
+                list_data[target] = ''
+            else:
+                print("please enter correct id")
+                break
+
+            with open(f"{self.__class__.__name__.lower()}.csv", 'w+') as file:
+                file.writelines(list_data)
+                print(f"Data Deleted with id {user_id}")
+                # writer(list_data)
+        # rows = []
+        # with open(f"{self.__class__.__name__.lower()}.csv", 'r') as file:
+        #     reader = csv.reader(file)
+        #     rows = list(reader)
+        # if id < len(rows):
+        #     del rows[id]
+        # else:traget
+        #     print("Row Not found")
+
+        # # Write the modified contents back to the file
+        # with open(f"{self.__class__.__name__.lower()}.csv", 'w', newline='') as file:
+        #     writer = csv.writer(file)
+        #     writer.writerows(rows)
 
 
-    def show_data(self,name):
-        file_name = f'{name}.csv'
-        with open(file_name, 'r') as csv_file:
-            reader = csv.reader(csv_file)
-            for r in reader:
-                print(r)
+    def show_data(self):
+        with open(f"{self.__class__.__name__.lower()}.csv", 'r') as csv_file:
+            # reader = csv.reader(csv_file)
+            # data_list = list(reader)
+            reader = csv_file.readlines()
+            data_list = list(reader)
+            # print(len(data_list))
+            for i in range(len(data_list)):
+                if i == 0:
+                    continue
+                print(data_list[i])
             # print(reader)
 
-
-class Person(CrudCsv):
-    def create_csv(self, name, data, header):
-        return super().create_csv(name, data, header)
-
+class Employee(CrudCsv):
+    def __init__(self,id,name,salary):  
+        self.id=id
+        self.title=name
+        self.salary=salary
 
 class Student(CrudCsv):
-    def create_csv(self, name, data, header):
-        return super().create_csv(name, data, header)
+    def __init__(self,id,name,faculty):
+        self.id = id
+        self.name = name
+        self.faculty = faculty
 
-# for parent        
-header = ['Id','Name','Age']
-file_name = 'person'
-data = "2,'Anil',20"
-updated_data = "Ram Saran"
-id = 1
+# for employee
+obj = Employee(2,"Ram Bahadur", 2000)
+obj.create_csv()
+# obj.update_csv(2,"Hari Bahadur",50000)
 
 
-# for Persond
-person = Person()
-# person.create_csv(file_name,data,header)
-# person.update_csv(file_name, updated_data, id)
-# person.delete_data(file_name,id)
-# person.show_data(file_name)
 
-# for Student
-stud = Student()
-file_name = 'student'
-stud.create_csv(file_name, data, header)
-# stud.update_csv(file_name, updated_data,id)
-# stud.delete_data(file_name,id)
-# stud.show_data(file_name)
+
+
+
+
+
+
