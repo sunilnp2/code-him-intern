@@ -79,6 +79,7 @@ class Main:
                 print("Enter correct Id")
             with open(f"{self.__class__.__name__.lower()}.csv","w+") as file:
                 file.writelines(data)
+                file.writelines("\n")
                 print("Successfully Updated !!!! ")
         else:
             print("Please provide correct id")
@@ -129,11 +130,11 @@ class Person(Main):
         
 
 
-b=Book(2,"GoodBook","Ram1")
+b=Book(3,"GoodBook","Ram1")
 b2=Book(3,"GoodBook2","Ram22")
 b3=Book(4,"BJGG","KKSH")
 # b.save()
-b.update(2,"badbook","sunil")
+b.update(3,"badbook","sunil")
 
 
 
